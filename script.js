@@ -183,16 +183,19 @@ const gameOverHeight = 60; // コップの一定の高さ（例：150）
 Events.on(engine, 'afterUpdate', () => {
     if (!isGameOver) {
         Composite.allBodies(engine.world).forEach((body) => {
-            if (!body.isStatic) {
+            if (!body.isStatic && !isGameOver) {
                 const isOutsideCup = body.position.x < cupLeft.bounds.max.x ||
                     body.position.x > cupRight.bounds.min.x ||
                     body.position.y > cupBottom.bounds.max.y;
                 if (isOutsideCup || (!isSkippingGameOverCheck && body.position.y < gameOverHeight)) {
                     const gameOverMessage = document.getElementById('game-over-message');
-                    gameOverMessage.style.display = 'block';
+                    gameOverMessage.style.display = 'flex';
                     isGameOver = true;
                     console.log(`ゲームオーバー: x=${body.position.x}, y=${body.position.y}`);
                     updateFacePreview();
+                    if (window.showGameOverRankingForm) {
+                        window.showGameOverRankingForm(scoreCount, tomatoCount);
+                    }
                     render.canvas.removeEventListener('pointerdown', handlePointerDown);
                     // 物理演算エンジンのランナーを停止
                     Runner.stop(runner);                    
