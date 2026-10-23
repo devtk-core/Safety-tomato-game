@@ -6,6 +6,7 @@
 - Webブラウザ(PC,Android,iOS等)
 ## リンク
 https://main.d2crxhyesq64vf.amplifyapp.com/
+
 ## みんなのランキング（Cloudflare Pages）
 
 ランキングを有効にするには、Cloudflare Pages、D1、Turnstile の設定が必要です。設定が終わるまではサイトに「ランキングは準備中です」と表示されます。Amplify の静的ホスティングだけではランキング API は動きません。
