@@ -183,7 +183,7 @@ const gameOverHeight = 60; // コップの一定の高さ（例：150）
 Events.on(engine, 'afterUpdate', () => {
     if (!isGameOver) {
         Composite.allBodies(engine.world).forEach((body) => {
-            if (!body.isStatic) {
+            if (!body.isStatic && !isGameOver) {
                 const isOutsideCup = body.position.x < cupLeft.bounds.max.x ||
                     body.position.x > cupRight.bounds.min.x ||
                     body.position.y > cupBottom.bounds.max.y;
