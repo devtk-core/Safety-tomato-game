@@ -272,13 +272,15 @@ function updateFacePreview() {
         faceImage.src = 'img/face_0.png';  
     }
 }
-let isProcessingCollision = false;
+// 合体予定の果物を記録し、同じ果物を複数回の合体に使わない
+const mergingBodies = new WeakSet();
 Events.on(engine, 'collisionStart', (event) => {
-    if (isProcessingCollision) return; // 処理中ならスキップ
     const pairs = event.pairs;
 
     pairs.forEach((pair) => {
         const { bodyA, bodyB } = pair;
+
+        if (mergingBodies.has(bodyA) || mergingBodies.has(bodyB)) return;
 
         // どちらのボディも静的（コップなど）でないことを確認
         if (!bodyA.isStatic && !bodyB.isStatic) {
@@ -323,6 +325,10 @@ Events.on(engine, 'collisionStart', (event) => {
                     return;
                 }
 
+                // setTimeout より先に予約し、同じ更新内の別の衝突ペアから守る
+                mergingBodies.add(bodyA);
+                mergingBodies.add(bodyB);
+
                 // 衝突したボディを少し遅れて削除
                 setTimeout(() => {
                     Composite.remove(engine.world, bodyA);
@@ -345,11 +351,6 @@ Events.on(engine, 'collisionStart', (event) => {
 
                     // 新しいフルーツに物理エンジンを適用して追加
                     Composite.add(engine.world, newFruit);
-
-                    setTimeout(() => {
-                        isProcessingCollision = false;
-                    }, 100); // 100ミリ秒のクールダウン
-
 
                     // 新しいフルーツに初期の下向き速度を与える
                     Matter.Body.setVelocity(newFruit, { x: (Math.random() - 0.5) * 2, y: 5 });
