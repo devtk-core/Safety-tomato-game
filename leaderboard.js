@@ -54,6 +54,7 @@ async function prepareTurnstile() {
         await loadTurnstileScript();
         widgetId = window.turnstile.render(turnstileContainer, {
             sitekey: siteKey,
+            size: 'compact',
             action: 'score-submit',
             callback(token) {
                 turnstileToken = token;
