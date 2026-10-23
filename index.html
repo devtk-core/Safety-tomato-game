@@ -14,7 +14,7 @@
     </script>
     <title>🍅安心トマトゲーム🍅</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script>
-    <script src="script.js?v=2026.10.24.3" defer></script>
+    <script src="script.js?v=2026.10.24.4" defer></script>
     <style>
         @font-face {
             font-family: 'MisakiGothic';
@@ -73,13 +73,19 @@
 
         #game-container {
             position: relative;
-            width: 100vw;
-            max-width: 320px; /* 最大幅を指定 */
-            height: 100vh;
-            max-height: 440px; /* 最大高さを指定 */
+            width: min(312px, 100vw);
+            aspect-ratio: 13 / 18;
+            overflow: hidden;
             border: 1px solid #000000;
             box-sizing: border-box; /* ボーダーを含めたサイズ指定にする */
             margin: 0 auto; /* ゲームコンテナを中央に配置 */
+        }
+
+        #game-container canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: manipulation;
         }
 
         #start-overlay {
@@ -255,7 +261,7 @@
     <!-- スコア -->
     <div id="score">とくてん: 0</div>
     <!-- 新しい版を公開するときは、この値を更新する -->
-    <div id="version">v2026.10.24.3</div>
+    <div id="version">v2026.10.24.4</div>
     <!-- ゲームコンテナ -->
     <div id="game-container">
         <button id="start-overlay" type="button" aria-label="ゲームをスタート">
@@ -282,6 +288,11 @@
 
     <section id="updates" aria-labelledby="updates-title">
         <h2 id="updates-title">更新履歴</h2>
+        <p><time datetime="2026-10-24">2026/10/24</time>（v2026.10.24.4）</p>
+        <ul>
+            <li>ゲームオーバーの顔と音量ボタンを修正</li>
+            <li>スマホ画面の表示とタップ位置を改善</li>
+        </ul>
         <p><time datetime="2026-10-24">2026/10/24</time>（v2026.10.24.3）</p>
         <ul>
             <li>タップ・クリックで始めるスタート画面を追加</li>
