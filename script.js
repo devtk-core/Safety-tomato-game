@@ -6,7 +6,6 @@ const render = Render.create({
     engine: engine,
     options: {
         width: 310,
-//        width: window.innerWidth > 600 ? 400 : window.innerWidth, // PC用の固定幅(400px)かスマホサイズかを判断
         height: 430,
         wireframes: false,
         background: '#FFD1DC'  // 薄いピンク色の背景に変更
@@ -32,7 +31,8 @@ let isMuted = false;
 function createMuteButton() {
     const muteButton = document.createElement('button');
     muteButton.id = 'mute-button';
-    muteButton.textContent = '🔇';
+    muteButton.textContent = '🔊';
+    muteButton.setAttribute('aria-label', '音を消す');
     muteButton.style.position = 'absolute';
     muteButton.style.top = '10px';  // ゲーム画面内の位置を調整
     muteButton.style.right = '10px';
@@ -48,11 +48,8 @@ function createMuteButton() {
         isMuted = !isMuted;
         bgm.muted = isMuted;
 
-        if (isMuted) {
-            muteButton.textContent = '🔈';  // ミュート解除アイコンに変更
-        } else {
-            muteButton.textContent = '🔇';  // ミュートアイコンに変更
-        }
+        muteButton.textContent = isMuted ? '🔇' : '🔊';
+        muteButton.setAttribute('aria-label', isMuted ? '音を出す' : '音を消す');
     });
 
     // ゲームコンテナにミュートボタンを追加
@@ -158,34 +155,17 @@ Composite.add(engine.world, [cupBottom, cupLeft, cupRight]);
 // フルーツをクリックまたはタップで生成するリスナー
 let isGeneratingFruit = false;  // フルーツ生成の間隔を制御するためのフラグ
 
-function handleClick(event) {
-    if (!isGameOver && !isGeneratingFruit) {
-        const rect = render.canvas.getBoundingClientRect();
-        let x, y;
+function handlePointerDown(event) {
+    if (isGameOver || isGeneratingFruit) return;
 
-        if (event.type === 'click') {
-            // PC用のクリックイベント
-            x = event.clientX - rect.left;
-            y = event.clientY - rect.top;
-            console.log(`クリックが検出: x=${x}, y=${y}`);
-        } else if (event.type === 'touchstart') {
-            // スマホ用のタッチイベント
-            const touch = event.touches[0];
-            x = touch.clientX - rect.left;
-            y = touch.clientY - rect.top;
-            console.log(`タップが検出: x=${x}, y=${y}`);
-        }
+    const rect = render.canvas.getBoundingClientRect();
+    const x = (event.clientX - rect.left) * (render.canvas.width / rect.width);
+    createFruit(x, 70);
 
-        // フルーツは一番上から落ちるようにするため、y座標を0に設定
-        createFruit(x, 70);
-
-//        // フルーツ生成の間隔を制御する
-        isGeneratingFruit = true;
-        setTimeout(() => {
-            isGeneratingFruit = false;
-        }, 500);  // 500ミリ秒待機（必要に応じて調整可能）
-
-    }
+    isGeneratingFruit = true;
+    setTimeout(() => {
+        isGeneratingFruit = false;
+    }, 500);
 }
 
 // BGMのループ処理
@@ -194,16 +174,8 @@ bgm.addEventListener('ended', () => {
     bgm.play();
 });
 
-// タッチイベントの最初の一度のタッチにだけ反応するようにするリスナー
-function handleTouchStart(event) {
-    handleClick(event);
-}
-
-// イベントリスナーをキャンバスに追加
-render.canvas.addEventListener('click', handleClick);
-render.canvas.addEventListener('touchstart', handleTouchStart);  // スマホ用のタッチイベントを追加
-
-
+// マウスとタッチを同じイベントで処理する
+render.canvas.addEventListener('pointerdown', handlePointerDown);
 
 const gameOverHeight = 60; // コップの一定の高さ（例：150）
 
@@ -221,8 +193,7 @@ Events.on(engine, 'afterUpdate', () => {
                     isGameOver = true;
                     console.log(`ゲームオーバー: x=${body.position.x}, y=${body.position.y}`);
                     updateFacePreview();
-                    render.canvas.removeEventListener('click', handleClick);
-                    render.canvas.removeEventListener('touchstart', handleTouchStart);
+                    render.canvas.removeEventListener('pointerdown', handlePointerDown);
                     // 物理演算エンジンのランナーを停止
                     Runner.stop(runner);                    
                     
@@ -248,6 +219,12 @@ function updateScore() {
 function updateFacePreview() {
     const faceImage = document.getElementById('face-image');
     
+    // ゲームオーバー時はトマトの数に関係なく専用の顔を表示
+    if (isGameOver) {
+        faceImage.src = 'img/face_0.png';
+        return;
+    }
+
     // トマトの出現数によって顔画像を変更
     if (tomatoCount === 0) {
         faceImage.src = 'img/face_1.png';
@@ -264,11 +241,9 @@ function updateFacePreview() {
     } else if (tomatoCount === 4) {
         faceImage.src = 'img/face_5.png';
         ratio = 3;   
-    } else if (tomatoCount === 5) {
-        faceImage.src = 'img/face_6.png'; 
-        ratio = 3.5;   
-    } else if (isGameOver === true) {
-        faceImage.src = 'img/face_0.png';  
+    } else {
+        faceImage.src = 'img/face_6.png';
+        ratio = 3.5;
     }
 }
 // 合体予定の果物を記録し、同じ果物を複数回の合体に使わない
