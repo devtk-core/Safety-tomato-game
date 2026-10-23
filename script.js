@@ -125,7 +125,12 @@ Composite.add(engine.world, [cupBottom, cupLeft, cupRight]);
     function createFruit(x, y) {
         const fruitImageUrl = nextFruitUrl;  // 現在の次の果物のURL
         const size = fruitSizes[fruitImageUrl] || 32;  // サイズ設定がない場合デフォルト32
-        const fruit = Bodies.circle(x, y, size / 2, {
+        // 果物全体がコップの内側に入る位置から落とす
+        const radius = size / 2;
+        const minX = cupLeft.bounds.max.x + radius;
+        const maxX = cupRight.bounds.min.x - radius;
+        const dropX = Math.max(minX, Math.min(x, maxX));
+        const fruit = Bodies.circle(dropX, y, radius, {
             restitution: 0.5,
             render: {
                 sprite: {
@@ -136,7 +141,7 @@ Composite.add(engine.world, [cupBottom, cupLeft, cupRight]);
             }
         });
         Composite.add(engine.world, fruit);
-        console.log(`フルーツ生成完了: x=${x}, y=${y}`);
+        console.log(`フルーツ生成完了: x=${dropX}, y=${y}`);
 
         // フルーツを生成後、一定時間ゲームオーバー判定を無効化
         isSkippingGameOverCheck = true;
@@ -213,10 +218,13 @@ const gameOverHeight = 60; // コップの一定の高さ（例：150）
 
 // コップからあふれたかを確認するイベント
 Events.on(engine, 'afterUpdate', () => {
-    if (!isGameOver && !isSkippingGameOverCheck) {  // 判定をスキップ中でない場合のみチェック
+    if (!isGameOver) {
         Composite.allBodies(engine.world).forEach((body) => {
             if (!body.isStatic) {
-                if (body.position.y < gameOverHeight) {  // ゲームオーバーの条件
+                const isOutsideCup = body.position.x < cupLeft.bounds.max.x ||
+                    body.position.x > cupRight.bounds.min.x ||
+                    body.position.y > cupBottom.bounds.max.y;
+                if (isOutsideCup || (!isSkippingGameOverCheck && body.position.y < gameOverHeight)) {
                     const gameOverMessage = document.getElementById('game-over-message');
                     gameOverMessage.style.display = 'block';
                     isGameOver = true;
