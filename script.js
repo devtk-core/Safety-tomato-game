@@ -23,7 +23,6 @@ let isSkippingGameOverCheck = false;  // ゲームオーバー判定を一時的
 
 // BGMの設定
 const bgm = document.getElementById('bgm');
-let isFirstPlay = true;  // 最初の再生かどうかを判定するフラグ
 bgm.volume = 0.2;  // 初期音量を設定
 
 // ミュートの切り替え
@@ -160,14 +159,6 @@ Composite.add(engine.world, [cupBottom, cupLeft, cupRight]);
 let isGeneratingFruit = false;  // フルーツ生成の間隔を制御するためのフラグ
 
 function handleClick(event) {
-    // 最初のクリックでBGMを再生
-    if (isFirstPlay) {
-        bgm.play();
-        bgm.volume = 0.2;  // 音量を20%に設定
-        isFirstPlay = false;
-        createMuteButton();  // ミュートボタンを生成
-    }
-
     if (!isGameOver && !isGeneratingFruit) {
         const rect = render.canvas.getBoundingClientRect();
         let x, y;
@@ -376,6 +367,14 @@ Events.on(engine, 'collisionStart', (event) => {
 }
 // ページ読み込み時にすぐにゲーム開始
 window.onload = () => {
-    createMuteButton();  // ミュートボタンを生成
     startGame();
+    const startOverlay = document.getElementById('start-overlay');
+    startOverlay.addEventListener('click', () => {
+        startOverlay.remove();
+        createMuteButton();
+        const playback = bgm.play();
+        if (playback && typeof playback.catch === 'function') {
+            playback.catch(() => {});
+        }
+    }, { once: true });
 };
