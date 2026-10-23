@@ -5,6 +5,7 @@ const submitStatus = document.getElementById('score-submit-status');
 const submitButton = document.getElementById('submit-score');
 const nameInput = document.getElementById('player-name');
 const turnstileContainer = document.getElementById('turnstile-container');
+const restartButton = document.getElementById('restart-game');
 
 let siteKey = '';
 let turnstileToken = '';
@@ -110,5 +111,7 @@ scoreForm.addEventListener('submit', async (event) => {
         if (widgetId !== null) window.turnstile.reset(widgetId);
     }
 });
+
+restartButton.addEventListener('click', () => window.location.reload());
 
 loadRanking();
