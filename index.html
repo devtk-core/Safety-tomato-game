@@ -82,7 +82,7 @@
             margin: 0 auto; /* ゲームコンテナを中央に配置 */
         }
 
-        #rules {
+        #rules, #updates {
             text-align: center;
             max-width: 320px; /* ゲームコンテナと同じ幅にする */
             margin: 20px auto; /* 上下の余白を調整 */
@@ -175,6 +175,32 @@
             font-family: 'MisakiGothic', sans-serif; /* 日本語ドットフォントを適用 */
             font-size: 1.5em; /* 読みやすいサイズに調整 */
         }
+        #version {
+            width: 100%;
+            max-width: 320px;
+            box-sizing: border-box;
+            padding-right: 4px;
+            margin: 2px 0 4px;
+            text-align: right;
+            color: #8B4513;
+            font-family: 'MisakiGothic', sans-serif;
+            font-size: 12px;
+        }
+        #updates {
+            margin-top: 0;
+        }
+        #updates ul {
+            text-align: left;
+            padding-left: 1.5em;
+        }
+        #site-footer {
+            margin: 0 auto 20px;
+            font-family: 'MisakiGothic', sans-serif;
+            font-size: 0.9em;
+        }
+        #site-footer a {
+            color: #8B4513;
+        }
     </style>
 </head>
 <body>
@@ -200,6 +226,8 @@
     <div id="tomato-counter">🍅のかず: 0</div>
     <!-- スコア -->
     <div id="score">とくてん: 0</div>
+    <!-- 新しい版を公開するときは、この値を更新する -->
+    <div id="version">v2026.10.24.1</div>
     <!-- ゲームコンテナ -->
     <div id="game-container">
     </div>
@@ -219,6 +247,19 @@
         <p>あふれる　と　ゲームオーバー⚠️</p>
         <p>タイトル　を　おす　と　やりなおし</p>
     </div>
+
+    <section id="updates" aria-labelledby="updates-title">
+        <h2 id="updates-title">更新履歴</h2>
+        <p><time datetime="2026-10-24">2026/10/24</time>（v2026.10.24.1）</p>
+        <ul>
+            <li>同時衝突で果物が増える問題を修正</li>
+            <li>バージョン表示と更新履歴を追加</li>
+            <li>作者サイトへのリンクを追加</li>
+        </ul>
+    </section>
+    <footer id="site-footer">
+        <a href="https://www.dennou.tech/" target="_blank" rel="noopener noreferrer">でんのうてっく（作者のサイト）</a>
+    </footer>
 
     <div id="game-over-message">Game Over！</div> 
     <!-- BGM音楽 -->
