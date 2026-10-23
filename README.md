@@ -11,7 +11,7 @@ https://main.d2crxhyesq64vf.amplifyapp.com/
 
 ランキングを有効にするには、Cloudflare Pages、D1、Turnstile の設定が必要です。設定が終わるまではサイトに「ランキングは準備中です」と表示されます。Amplify の静的ホスティングだけではランキング API は動きません。
 
-1. Cloudflare Pages でこの GitHub リポジトリを接続します。PR #14 の確認中は Production branch を `feat/global-leaderboard` にし、Build command は `sh build.sh`、Build output directory は `dist` にします。`main` にはまだ `build.sh` がないため、最初から `main` を選ぶとビルドできません。
+1. Cloudflare Pages でこの GitHub リポジトリを接続します。PR #14 の確認中は Production branch を `feat/global-leaderboard` にし、Build command は `sh build.sh`、Build output directory は `dist` にします。`main` にはまだ `build.sh` がないため、最初から `main` を選ぶとビルドできません。 GitHub の Cloudflare Workers and Pages アプリに `devtk-core/Safety-tomato-game` へのアクセスを許可してください。
 2. D1 データベースを作成し、SQL を適用します。
    ```sh
    npx wrangler d1 create safety-tomato-ranking
