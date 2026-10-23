@@ -19,7 +19,7 @@ https://main.d2crxhyesq64vf.amplifyapp.com/
    ```
 3. Pages の Settings → Bindings で D1 を `DB` という名前で接続します。本番環境とプレビュー環境は、必要に応じて別の D1 を使用します。
 4. Turnstile ウィジェットを作り、Pages の Settings → Variables and Secrets に `TURNSTILE_SITE_KEY` と `TURNSTILE_SECRET_KEY` を設定します。シークレットキーは Secret として保存します。許可するホスト名に Pages のドメインを登録します。
-5. Pages を再デプロイし、`/api/leaderboard` に `scores` が返ることを確認します。ゲーム終了後に名前を入力し、認証を通してスコアを登録します。
+5. D1 バインディングと Turnstile の2つの変数は次のデプロイで反映されます。Pages を再デプロイし、`/api/leaderboard` に `scores` が返ることを確認します。ゲーム終了後に名前を入力し、認証を通してスコアを登録します。
 6. 動作確認後に PR #14 をマージし、Pages の Production branch を `main` に変更します。`main` のデプロイが成功したら公開URLを切り替えます。
 
 ランキングは匿名で、ブラウザが送ったスコアを受け取ります。Turnstile は自動投稿を抑えるためのもので、スコア改ざんを完全には防げません。競技性が必要ならサーバー側でプレイ結果を検証する仕組みを追加してください。
