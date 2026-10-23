@@ -37,6 +37,10 @@ export async function onRequestPost({ request, env }) {
         return Response.json({ error: '入力形式を確認してください' }, { status: 400 });
     }
 
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+        return Response.json({ error: '入力形式を確認してください' }, { status: 400 });
+    }
+
     const name = typeof body.name === 'string' ? body.name.trim() : '';
     if (!name || Array.from(name).length > 16 || /[\u0000-\u001f\u007f]/u.test(name) ||
         !Number.isSafeInteger(body.scoreX2) || body.scoreX2 < 0 || body.scoreX2 > 100000000 ||
