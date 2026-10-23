@@ -189,10 +189,13 @@ Events.on(engine, 'afterUpdate', () => {
                     body.position.y > cupBottom.bounds.max.y;
                 if (isOutsideCup || (!isSkippingGameOverCheck && body.position.y < gameOverHeight)) {
                     const gameOverMessage = document.getElementById('game-over-message');
-                    gameOverMessage.style.display = 'block';
+                    gameOverMessage.style.display = 'flex';
                     isGameOver = true;
                     console.log(`ゲームオーバー: x=${body.position.x}, y=${body.position.y}`);
                     updateFacePreview();
+                    if (window.showGameOverRankingForm) {
+                        window.showGameOverRankingForm(scoreCount, tomatoCount);
+                    }
                     render.canvas.removeEventListener('pointerdown', handlePointerDown);
                     // 物理演算エンジンのランナーを停止
                     Runner.stop(runner);                    
