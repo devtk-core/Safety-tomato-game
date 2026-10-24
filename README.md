@@ -5,7 +5,9 @@
 ## 対応端末
 - Webブラウザ(PC,Android,iOS等)
 ## リンク
-https://main.d2crxhyesq64vf.amplifyapp.com/
+https://safety-tomato-game.pages.dev/
+
+ゲームオーバー後は盤面の画像とスコアを共有できます。画像共有に対応した端末では共有先で X を選択してください。対応していないブラウザでは画像を保存し、X の投稿画面に添付してください。投稿文には `#安心トマトゲーム` とゲームの URL が入ります。
 
 ## みんなのランキング（Cloudflare Pages）
 

@@ -14,8 +14,9 @@
     </script>
     <title>🍅安心トマトゲーム🍅</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script>
-    <script src="script.js?v=2026.10.24.5" defer></script>
+    <script src="script.js?v=2026.10.25.1" defer></script>
     <script src="leaderboard.js?v=2026.10.24.6" defer></script>
+    <script src="share.js?v=2026.10.25.1" defer></script>
     <style>
         @font-face {
             font-family: 'MisakiGothic';
@@ -130,27 +131,30 @@
         }
 
         #game-over-message {
-            display: none;
-            position: absolute;
-            inset: 0;
-            z-index: 15;
+            display: flex;
             box-sizing: border-box;
-            padding: 16px;
-            overflow-y: auto;
+            width: min(320px, 100vw);
+            margin: 12px auto 0;
+            padding: 14px;
             flex-direction: column;
             align-items: center;
-            justify-content: safe center;
-            gap: 8px;
-            color: white;
-            background-color: rgba(0, 0, 0, 0.82);
+            gap: 10px;
+            color: #8B4513;
+            background-color: white;
+            border-radius: 6px;
             font-family: 'MisakiGothic', sans-serif;
             text-align: center;
         }
+        #game-over-message[hidden] { display: none; }
         #game-over-message h2, #game-over-message p { margin: 0; }
         #score-form { display: grid; gap: 8px; width: 100%; max-width: 260px; }
         #score-form input, #score-form button { box-sizing: border-box; width: 100%; padding: 8px; font: inherit; }
         #score-form button { cursor: pointer; }
-        #restart-game { box-sizing: border-box; width: 100%; max-width: 260px; padding: 8px; font: inherit; cursor: pointer; }
+        #restart-game, #share-game-over { box-sizing: border-box; width: 100%; max-width: 260px; padding: 8px; font: inherit; cursor: pointer; }
+        #share-game-over:disabled { cursor: wait; }
+        #share-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; font-size: 0.85em; }
+        #share-actions[hidden] { display: none; }
+        #share-actions a { color: #8B4513; }
         #score-form[hidden] { display: none; }
         #turnstile-container { min-height: 65px; display: flex; justify-content: center; }
         #ranking-status, #score-submit-status { min-height: 1.4em; }
@@ -289,26 +293,32 @@
     <!-- スコア -->
     <div id="score">とくてん: 0</div>
     <!-- 新しい版を公開するときは、この値を更新する -->
-    <div id="version">v2026.10.24.6</div>
+    <div id="version">v2026.10.25.1</div>
     <!-- ゲームコンテナ -->
     <div id="game-container">
         <button id="start-overlay" type="button" aria-label="ゲームをスタート">
             <strong>TAP TO START</strong>
             <small>タップまたはクリック</small>
         </button>
-        <div id="game-over-message" role="dialog" aria-labelledby="game-over-title">
-            <h2 id="game-over-title">Game Over！</h2>
-            <p id="final-score"></p>
-            <form id="score-form">
-                <label for="player-name">ランキングに登録</label>
-                <input id="player-name" name="name" type="text" maxlength="32" placeholder="なまえ（16文字まで）" autocomplete="nickname" required>
-                <div id="turnstile-container"></div>
-                <button id="submit-score" type="submit" disabled>スコアを登録</button>
-            </form>
-            <p id="score-submit-status" role="status" aria-live="polite"></p>
-            <button id="restart-game" type="button">もう一度遊ぶ</button>
-        </div>
     </div>
+    <section id="game-over-message" aria-labelledby="game-over-title" hidden>
+        <h2 id="game-over-title">Game Over！</h2>
+        <p id="final-score"></p>
+        <button id="share-game-over" type="button" disabled>画像をXにシェア</button>
+        <p id="share-status" role="status" aria-live="polite">画像を準備中…</p>
+        <div id="share-actions" hidden>
+            <a id="download-game-over" download="anshin-tomato-result.png">画像を保存</a>
+            <a id="open-x-post" target="_blank" rel="noopener noreferrer">Xの投稿画面を開く</a>
+        </div>
+        <form id="score-form">
+            <label for="player-name">ランキングに登録</label>
+            <input id="player-name" name="name" type="text" maxlength="32" placeholder="なまえ（16文字まで）" autocomplete="nickname" required>
+            <div id="turnstile-container"></div>
+            <button id="submit-score" type="submit" disabled>スコアを登録</button>
+        </form>
+        <p id="score-submit-status" role="status" aria-live="polite"></p>
+        <button id="restart-game" type="button">もう一度遊ぶ</button>
+    </section>
     <section id="ranking" aria-labelledby="ranking-title">
         <h2 id="ranking-title">みんなのランキング TOP 10</h2>
         <p id="ranking-status" role="status" aria-live="polite">読み込み中…</p>
@@ -333,6 +343,8 @@
 
     <section id="updates" aria-labelledby="updates-title">
         <h2 id="updates-title">更新履歴</h2>
+        <p><time datetime="2026-10-25">2026/10/25</time>（v2026.10.25.1）</p>
+        <ul><li>ゲームオーバーの画像共有と、果物と壁の表示を改善</li></ul>
         <p><time datetime="2026-10-24">2026/10/24</time>（v2026.10.24.6）</p>
         <ul><li>ゲームオーバー画面に「もう一度遊ぶ」を追加</li></ul>
         <p><time datetime="2026-10-24">2026/10/24</time>（v2026.10.24.5）</p>
