@@ -219,11 +219,11 @@ Events.on(engine, 'afterUpdate', () => {
     if (!isGameOver) {
         Composite.allBodies(engine.world).forEach((body) => {
             if (!body.isStatic && !isGameOver) {
-                // 物体の中心だけでなく外周を見て、壁の外へ出た瞬間を検出する。
-                const overflowMargin = 2;
-                const isOutsideCup = body.bounds.min.x < cupLeft.bounds.min.x - overflowMargin ||
-                    body.bounds.max.x > cupRight.bounds.max.x + overflowMargin ||
-                    body.bounds.max.y > cupBottom.bounds.max.y + overflowMargin;
+                // 衝突中の bounds は壁と一時的に重なるため、中心が壁の外へ出た場合だけ判定する。
+                const overflowMargin = 3;
+                const isOutsideCup = body.position.x < cupLeft.bounds.min.x - overflowMargin ||
+                    body.position.x > cupRight.bounds.max.x + overflowMargin ||
+                    body.position.y > cupBottom.bounds.max.y + overflowMargin;
                 if (isOutsideCup || (!isSkippingGameOverCheck && body.position.y < gameOverHeight)) {
                     const gameOverMessage = document.getElementById('game-over-message');
                     gameOverMessage.hidden = false;
