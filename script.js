@@ -19,6 +19,7 @@ Runner.run(runner, engine);
 
 let isGameOver = false;
 let isSkippingGameOverCheck = false;  // ゲームオーバー判定を一時的に無効にするためのフラグ
+let gameOverImageCaptured = false;
 
 // BGMの設定
 const bgm = document.getElementById('bgm');
@@ -103,7 +104,41 @@ Composite.add(engine.world, [cupBottom, cupLeft, cupRight]);
         './img/tomato.gif': 120
     };
 
-    const originalImageSize = 320; // 元の画像サイズ（500ピクセル）
+    // GIF の縦横は同じではない。長辺を当たり判定の直径に合わせる。
+    const imageDimensions = {
+        './img/image1.gif': [320, 352],
+        './img/image2.gif': [320, 400],
+        './img/image3.gif': [320, 383],
+        './img/image4.gif': [320, 320],
+        './img/image5.gif': [320, 365],
+        './img/image6.gif': [320, 336],
+        './img/tomato.gif': [352, 304]
+    };
+    function spriteScale(url, size) {
+        return size / Math.max(...imageDimensions[url]);
+    }
+
+    // Matter.js は追加順に描画するため、壁を果物の手前にも描いて貫通して見えないようにする。
+    Events.on(render, 'afterRender', () => {
+        const context = render.context;
+        context.save();
+        context.fillStyle = '#8B4513';
+        for (const wall of [cupLeft, cupRight, cupBottom]) {
+            context.beginPath();
+            context.moveTo(wall.vertices[0].x, wall.vertices[0].y);
+            for (let i = 1; i < wall.vertices.length; i++) {
+                context.lineTo(wall.vertices[i].x, wall.vertices[i].y);
+            }
+            context.closePath();
+            context.fill();
+        }
+        context.restore();
+
+        if (isGameOver && !gameOverImageCaptured && window.prepareGameOverShare) {
+            gameOverImageCaptured = true;
+            window.prepareGameOverShare(render.canvas, scoreCount, tomatoCount);
+        }
+    });
 
     let nextFruitUrl = getRandomImageUrl();
     updateNextFruitPreview(nextFruitUrl);
@@ -131,8 +166,8 @@ Composite.add(engine.world, [cupBottom, cupLeft, cupRight]);
             render: {
                 sprite: {
                   texture: fruitImageUrl,
-                    xScale: size / originalImageSize,
-                    yScale: size / originalImageSize
+                    xScale: spriteScale(fruitImageUrl, size),
+                    yScale: spriteScale(fruitImageUrl, size)
                 }
             }
         });
@@ -184,12 +219,15 @@ Events.on(engine, 'afterUpdate', () => {
     if (!isGameOver) {
         Composite.allBodies(engine.world).forEach((body) => {
             if (!body.isStatic && !isGameOver) {
-                const isOutsideCup = body.position.x < cupLeft.bounds.max.x ||
-                    body.position.x > cupRight.bounds.min.x ||
-                    body.position.y > cupBottom.bounds.max.y;
+                // 衝突中の bounds は壁と一時的に重なるため、中心が壁の外へ出た場合だけ判定する。
+                const overflowMargin = 3;
+                const isOutsideCup = body.position.x < cupLeft.bounds.min.x - overflowMargin ||
+                    body.position.x > cupRight.bounds.max.x + overflowMargin ||
+                    body.position.y > cupBottom.bounds.max.y + overflowMargin;
                 if (isOutsideCup || (!isSkippingGameOverCheck && body.position.y < gameOverHeight)) {
                     const gameOverMessage = document.getElementById('game-over-message');
-                    gameOverMessage.style.display = 'flex';
+                    gameOverMessage.hidden = false;
+                    gameOverMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     isGameOver = true;
                     console.log(`ゲームオーバー: x=${body.position.x}, y=${body.position.y}`);
                     updateFacePreview();
@@ -312,16 +350,19 @@ Events.on(engine, 'collisionStart', (event) => {
                     Composite.remove(engine.world, bodyB);
 
                     // 新しいフルーツを生成し、衝突した2つのフルーツの位置の中間に配置
-                    const newX = (bodyA.position.x + bodyB.position.x) / 2;
-                    const newY = (bodyA.position.y + bodyB.position.y) / 2;
                     const collisize = fruitSizes[newImageUrl] || 32;  // サイズ設定がない場合デフォルト32
+                    const radius = collisize / 2;
+                    const newX = Math.max(cupLeft.bounds.max.x + radius,
+                        Math.min((bodyA.position.x + bodyB.position.x) / 2, cupRight.bounds.min.x - radius));
+                    const newY = Math.min((bodyA.position.y + bodyB.position.y) / 2,
+                        cupBottom.bounds.min.y - radius);
                     const newFruit = Bodies.circle(newX, newY, collisize / 2, {
                         restitution: 0.5,
                         render: {
                             sprite: {
                                 texture: newImageUrl,
-                                xScale: collisize / originalImageSize,  // サイズを適切に設定
-                                yScale: collisize / originalImageSize
+                                xScale: spriteScale(newImageUrl, collisize),
+                                yScale: spriteScale(newImageUrl, collisize)
                             }
                         }
                     });
